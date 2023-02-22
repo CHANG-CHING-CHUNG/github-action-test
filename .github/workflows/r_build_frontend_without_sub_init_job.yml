@@ -20,6 +20,7 @@ jobs:
       - name: 'Generate GitHub Actions Job Level Env'
         id: init
         run: |
-          echo "Build geoBingAn Frontend without init job"
-          echo ${{ needs.init_job.outputs.SKIP_FRONTEND }}
+          echo "Build geoBingAn Frontend without init job "
+          echo "check inputs.SKIP_FRONTEND variable"
+          echo ${{ inputs.SKIP_FRONTEND }}
           exit 1
