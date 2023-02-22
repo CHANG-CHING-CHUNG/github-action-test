@@ -1,5 +1,5 @@
 name: 'Build geoBingAn Website'
-on: [push]
+on: [workflow_dispatch]
 jobs:
   init_job:
     uses: ./.github/workflows/r_init_job.yml
