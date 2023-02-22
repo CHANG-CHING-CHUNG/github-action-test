@@ -76,7 +76,6 @@ jobs:
             | xargs \
               -i \
                 echo "{}" >> $GITHUB_OUTPUT
-          echo ${{ $GITHUB_OUTPUT }}
           # exit 1
       - name: 'Get job level output from env'
         id: from_env
