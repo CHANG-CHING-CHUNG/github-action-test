@@ -1,4 +1,4 @@
-name: 'Build geoBingAn Frontend'
+name: 'Build geoBingAn Frontend without init job'
 on:
   workflow_call:
     inputs:
@@ -9,11 +9,6 @@ on:
         required: false
         type: string
 jobs:
-  init_job:
-    uses: ./.github/workflows/r_init_job.yml
-    with:
-      ENV_FILE_PATH: .github/workflows/deploy.env
-    secrets: inherit
   build_frontend:
     name: 'Debug ENV variables'
     needs: ["init_job"]
@@ -26,6 +21,6 @@ jobs:
       - name: 'Generate GitHub Actions Job Level Env'
         id: init
         run: |
-          echo Build geoBingAn Frontend with init job
+          echo "Build geoBingAn Frontend without init job"
           echo ${{ needs.init_job.outputs.SKIP_FRONTEND }}
           exit 1

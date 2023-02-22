@@ -9,6 +9,12 @@ jobs:
     with:
       ENV_FILE_PATH: .github/workflows/deploy.env
       SKIP_FRONTEND: ${{ needs.init_job.outputs.SKIP_FRONTEND }}
+  build_frontend_without_sub_init_job:
+    uses: ./.github/workflows/r_build_frontend_without_sub_init_job.yml
+    needs: ["init_job"]
+    with:
+      ENV_FILE_PATH: .github/workflows/deploy.env
+      SKIP_FRONTEND: ${{ needs.init_job.outputs.SKIP_FRONTEND }}
   dev_init_job:
     name: 'Debugging the init_job'
     runs-on: ubuntu-latest
