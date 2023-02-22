@@ -1,0 +1,30 @@
+name: 'Build geoBingAn Website'
+on:
+  workflow_dispatch:
+    inputs:
+      tags:
+      description: 'Test scenario tags'
+      required: false
+      type: boolean
+jobs:
+  init_job:
+    uses: ./.github/workflows/r_init_job.yml
+  build_frontend:
+    uses: ./.github/workflows/r_build_frontend.yml
+    needs: ["init_job"]
+    with:
+      ENV_FILE_PATH: .github/workflows/deploy.env
+      SKIP_FRONTEND: ${{ needs.init_job.outputs.SKIP_FRONTEND }}
+  dev_init_job:
+    name: 'Debugging the init_job'
+    runs-on: ubuntu-latest
+    needs: ["init_job"]
+    if: |
+      needs.init_job.outputs.DEV_ENV_VAR  == 'true'
+        && needs.init_job.outputs.DEV_ENV_VAR == 'true'
+    steps:
+      - name: 'Generate GitHub Actions Job Level Env'
+        id: init
+        run: |
+          echo ${{ needs.init_job.outputs.SKIP_FRONTEND }}
+          exit 1

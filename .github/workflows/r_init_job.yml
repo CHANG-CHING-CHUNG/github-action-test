@@ -1,0 +1,105 @@
+name: 'Build geoBingAn Frontend'
+on:
+  workflow_call:
+    inputs:
+      ENV_FILE_PATH:
+        required: false
+        type: string
+    outputs:
+      # From Given file
+      # From GitHub Actions Global Env
+      DEBUG_HLINE:
+        description: "Horizontal line for debug"
+        value: ${{ jobs.init_job.outputs.DEBUG_HLINE }}
+      DEV_ENV_VAR:
+        description: "The first output string"
+        value: ${{ jobs.init_job.outputs.DEV_ENV_VAR }}
+      DEBUG_STDOUT:
+        description: "The first output string"
+        value: ${{ jobs.init_job.outputs.DEBUG_STDOUT }}
+      SKIP_FRONTEND:
+        description: "The first output string"
+        value: ${{ jobs.init_job.outputs.SKIP_FRONTEND }}
+      SKIP_I18N_JA:
+        description: "The first output string"
+        value: ${{ jobs.init_job.outputs.SKIP_I18N_JA }}
+      SKIP_INTEGRATION:
+        description: "The first output string"
+        value: ${{ jobs.init_job.outputs.SKIP_INTEGRATION }}
+      SKIP_LAMBDA:
+        description: "The first output string"
+        value: ${{ jobs.init_job.outputs.SKIP_LAMBDA }}
+      # From CLI
+      NOW_STAGE:
+        description: "The first output string"
+        value: ${{ jobs.init_job.outputs.NOW_STAGE }}
+jobs:
+  init_job:
+    # GitHub Actions don't support use env on job level
+    # https://stackoverflow.com/a/74386472/4464382
+    name: 'Warmup'
+    runs-on: ubuntu-latest
+    outputs:
+      # From Given file
+      # From GitHub Actions Global Env
+      DEBUG_HLINE: ${{ steps.from_file.outputs.DEBUG_HLINE }}
+      DEV_ENV_VAR: ${{ steps.from_file.outputs.DEV_ENV_VAR }}
+      DEBUG_STDOUT: ${{ steps.from_file.outputs.DEBUG_STDOUT }}
+      SKIP_FRONTEND: ${{ steps.from_file.outputs.SKIP_FRONTEND }}
+      SKIP_I18N_JA: ${{ steps.from_file.outputs.SKIP_I18N_JA }}
+      SKIP_INTEGRATION: ${{ steps.from_file.outputs.SKIP_INTEGRATION }}
+      SKIP_LAMBDA: ${{ steps.from_file.outputs.SKIP_LAMBDA }}
+      # From CLI
+      NOW_STAGE: ${{ steps.from_cli.outputs.NOW_STAGE }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: 'Get job level output form file'
+        id: from_file
+        run: |
+          ENV_FILE_DEFAULT=".github/workflows/.env.default"
+          ENV_FILE_PATH=${{ inputs.ENV_FILE_PATH }}
+          if [ "${{ inputs.ENV_FILE_PATH }}" == "" ]; then
+            ENV_FILE_PATH=".github/workflows/.env.default"
+          fi
+          if [ ! -r ${ENV_FILE_PATH} ]; then
+            echo "Missing file: ${ENV_FILE_PATH}"
+            echo "Use default: ${ENV_FILE_DEFAULT}"
+            ENV_FILE_PATH=".github/workflows/.env.default"
+          fi
+          if [ ! -r ${ENV_FILE_PATH} ]; then
+            echo "Missing file: ${ENV_FILE_PATH}"
+            exit 1
+          fi
+          grep \
+            -v '^#' \
+            ${ENV_FILE_PATH} \
+            | xargs \
+              -i \
+                echo "{}" >> $GITHUB_OUTPUT
+          echo ${{ $GITHUB_OUTPUT }}
+          # exit 1
+      - name: 'Get job level output from env'
+        id: from_env
+        run: |
+          env \
+            | grep "OUTPUT_PREFIX" \
+            | sed 's,^OUTPUT_PREFIX_,,g' \
+            | xargs \
+              -i \
+                echo "{}" >> $GITHUB_OUTPUT
+      - name: 'Get job level output from cli'
+        id: from_cli
+        run: |
+          if [[ ${GITHUB_REF} = "*beta*" ]]; then
+            echo "NOW_STAGE=beta" >> $GITHUB_OUTPUT
+          elif [[ ${GITHUB_REF} = "*prod*" ]]; then
+            echo "NOW_STAGE=prod" >> $GITHUB_OUTPUT
+          else
+            echo "NOW_STAGE=pull" >> $GITHUB_OUTPUT
+          fi
+          JSON_KEY=number
+          sed 's@,"@\n@g;' < ${GITHUB_EVENT_PATH} \
+            | grep -E '^'"${JSON_KEY}"'":"' \
+            | sed 's,'"${JSON_KEY}"'":"\(.*\)",\1,g' \
+            | echo >> $
+          echo ${{ github.event.pull_request }}
