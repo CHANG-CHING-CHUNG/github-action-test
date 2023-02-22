@@ -1,11 +1,5 @@
 name: 'Build geoBingAn Website'
-on:
-  workflow_dispatch:
-    inputs:
-      tags:
-      description: 'Test scenario tags'
-      required: false
-      type: boolean
+on: [push]
 jobs:
   init_job:
     uses: ./.github/workflows/r_init_job.yml
