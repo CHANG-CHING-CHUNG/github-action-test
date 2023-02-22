@@ -23,4 +23,6 @@ jobs:
           echo "Build geoBingAn Frontend without init job "
           echo "check inputs.SKIP_FRONTEND variable"
           echo ${{ inputs.SKIP_FRONTEND }}
+          echo "check inputs.ENV_FILE_PATH variable"
+          echo ${{ inputs.ENV_FILE_PATH }}
           exit 1
